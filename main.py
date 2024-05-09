@@ -1,3 +1,5 @@
+import json
+
 class GameState():
     def __init__(self, month, year):
         self.month = month
@@ -8,11 +10,18 @@ def load_game():
     load = input("Would you like to load a previous game? (Y/N) ")
     if (load.lower() == "y"):
         filepath = input("Enter the file path of the save file: ")
+        with open(filepath, "r") as infile:
+            data = json.load(infile)
+            # TODO: keep loading attrs in GameState
+            return GameState(data["month"], data["year"])
     else:
         return GameState(0, "Freshman")
 
 def save_game(g):
     filepath = input("Enter the location where you would like to save: ")
+    filecontent = json.dumps(g.__dict__)
+    with open(filepath, "w") as outfile:
+        outfile.write(filecontent)
 
 def choose_archetype():
     pass
@@ -35,19 +44,20 @@ def game_loop(g):
     
     # month passes
     g.month += 1
-    g.month %= 12
-    
-    if (g.year == "Freshman"):
-        g.year = "Sophomore"
-    elif (g.year == "Sophomore"):
-        g.year = "Junior"
-    elif (g.year == "Junior"):
-        g.year = "senior"
-    game_loop(g)
+    if (g.month == 12):
+        g.month = 0  
+        if (g.year == "Freshman"):
+            g.year = "Sophomore"
+        elif (g.year == "Sophomore"):
+            g.year = "Junior"
+        elif (g.year == "Junior"):
+            g.year = "senior"
     
     # action phase - recursive
     
     # Randomly pre-scheduled event
+    
+    game_loop(g)
 
 def finish():
     pass    
